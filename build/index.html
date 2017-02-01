@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="ngAppStrict" ng-strict-di="true">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="css/screen.css">
+      <link rel="shortcut icon" href="favicon.ico?v=2">
+      <title>Real Time STRF Visualization</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <link rel="stylesheet" href="../TemplateData/styleToUse.css">
+      <link rel="shortcut icon" href="favicon.ico" />
+      <script src="UnityProgress.js"></script>
+      <link href="https://fonts.googleapis.com/css?family=Maven+Pro" rel="stylesheet">
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script><script type="text/javascript" src="js/bundle.js"></script><script type="text/javascript" src="js/app.js"></script>
+      <script>
+        /* For toggling the help screen */
+        $(document).ready(function() {
+          $("#about").click(function(){ 
+            $("#introscreen").fadeToggle();
+          });
+        });
+
+        /*For checkboxes that select type of elec*/
+        function toggleElec(keyNum,cb){console.log(cb);console.log("clicked," + keyNum + " "+cb.checked);keyNumString = keyNum.toString(); SendMessage("Main Camera","toggleElectrodes",keyNumString+cb.checked);}
+        // SendMessage("Main Camera","toggleElectrodes","0false");
+        // SendMessage("Main Camera","toggleElectrodes","1false");
+        // SendMessage("Main Camera","toggleElectrodes","2false");
+        // SendMessage("Main Camera","toggleElectrodes","3false");
+        // SendMessage("Main Camera","toggleElectrodes","4false");
+        // SendMessage("Main Camera","toggleElectrodes","5false");
+        // console.log("turned off elecs");
+      </script>
+   </head>
+   <div class="wrap">
+   <body>
+    <div id="splashscreen" style="width:100%; height:100%; background-color:#BBBBBB; opacity:20%;z-index:500;"></div>
+    <div id="introscreen" style="visible: hidden">
+       <div style="float:left"></div>
+       <div style="width:70%; margin: 0 auto;"><p>This interactive brain viewer allows you to see how different speech sounds are represented in the human brain. The top panel shows the brain from one participant along with electrodes from a 256-channel electrocorticography grid implanted as part of surgical treatment for epilepsy. The bottom panel shows a running spectrogram of sound from either the microphone or pre-recorded sounds. The spectrogram shows what frequencies make up a sound from low at the bottom to high at the top, and also shows how they change over time (from left to right). </p><br/>
+         <p>After you click one of the buttons, brain responses are calculated based on models of how the brain responds to the spectrotemporal information present in speech.  These responses are modeled based on real data from one participant who listened to approximately 1 hour of naturally spoken English sentences.  The size of the electrode will increase with the amount of activity in the underlying brain area (<span style="font-size: 24px">bigger</span>=more active). Electrodes that respond to different classes of phonemes are colored differently. </p><br/>
+         <ul>
+         <li>Electrodes that respond most strongly to <span style="color:rgb(255,0,0)">vowels</span> are colored <span style="color:rgb(255,0,0)">red</span>. </li>
+         <li> Electrodes that respond most strongly to <span style="color: rgb(0,255,0)">fricative</span> phonemes (such as "f", "s", "sh", "ch", and "z") are colored <span style="color:rgb(0,255,0)">green</span>. </li>
+         <li> <span style="color:rgb(0,255,255)">Nasals</span> ("n", "m", or "ng") are <span style="color:rgb(0,255,255)">cyan</span>. </li>
+         <li> <span style="color:rgb(255,255,0)">Voiced plosives</span> ("b", "d", "g") are in <span style="color:rgb(255,255,0)">yellow</span>, and</li>
+         <li> <span style="color:rgb(255,0,255)">unvoiced plosives</span> ("p", "t", "k") are in <span style="color:rgb(255,0,255)">purple</span>.</li>
+         <li> <span style="background-color: #e3e3e3; color:rgb(0,0,255)">Liquids and glides</span> ("r", "l", "w", "y") are in <span style="background-color: #e3e3e3; color:rgb(0,0,255)">dark blue</span>.</li> 
+       </ul><br/>
+         <p>Click the microphone button to see predicted responses to your own voice in real time, or click the other buttons to listen to previously recorded example sounds.</p><br/>
+         <p>For more methodological details, see the <a href="summary.html">short summary here</a>.</p><br/>
+       <p>Developed by David Chang, Liberty Hamilton, and Morgan Lee at the <a href="http://changlab.ucsf.edu">Laboratory of Edward Chang at UCSF</a>. We thank Roger Anguera Singla of the Gazzaley lab for providing Glass Brain code. Special thanks to Jeramy Morrill and Boris Smus for developing the original <a href="https://musiclab.chromeexperiments.com/Spectrogram">Spectrogram code</a>, and a big thank you to the participants who volunteered their time and made this research possible. Participants provided written informed consent, and all procedures were approved by the UCSF Institutional Review Board.</p></div><div></div>
+   </div>
+
+    <div class="container">
+      <div id="about">&nbsp;&nbsp;&nbsp;?</div>
+      <img id="logo" src="img/changlabLogoWhite.png">
+
+       <div id="title-banner">  
+        <p>NeuroSpeech Player</p> 
+         </div>         
+     </div>
+    <div class="template">
+    <div class="template-wrap clear">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" height="400px" width="640px"></canvas>
+      <br>
+      <!-- <div class="logo"></div>
+      <div class="fullscreen"><img src="../TemplateData/fullscreen.png" width="38" height="38" alt="Fullscreen" title="Fullscreen" onclick="SetFullscreen(1);" /></div>
+      <div class="title">STRFRealTime</div> -->
+    </div>
+    <p class="footer">&laquo; created with <a href="http://unity3d.com/" title="Go to unity3d.com">Unity</a> &raquo;</p>
+    <script type='text/javascript'>
+  var Module = {
+    TOTAL_MEMORY: 268435456,
+    errorhandler: null,			// arguments: err, url, line. This function must return 'true' if the error is handled, otherwise 'false'
+    compatibilitycheck: null,
+    dataUrl: "../Release/STRFRealTimeWebGLwithColorSize.data",
+    codeUrl: "../Release/STRFRealTimeWebGLwithColorSize.js",
+    memUrl: "../Release/STRFRealTimeWebGLwithColorSize.mem",
+  };
+</script>
+<script src="../Release/UnityLoader.js"></script>
+  </div>
+</div>
+
+   <div id="tutorialintro" style="background-color:#007788;width:100%;height:120px;bottom:0%;z-index:10;margin:auto;position:absolute;color:#FFFFFF;z-index:12;opacity:0.95;">
+
+    <div data-name="Intro" id="InstructionBack" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button">
+            <div id="left_arrow" style="font-size:55px;float:left;position:absolute;bottom:50%;cursor: pointer;opacity:1.0;z-index:15;visibility:hidden;">&#8592;</div>
+    </div>
+    <div id="instructions" style="padding-left:60px; padding-right:60px;padding-top:10px; padding-bottom:0px;font-size:18px;text-align:center;vertical-align:middle;position:relative;margin:auto;opacity:1.0;line-height:1.3;font-weight:100;opacity:0.9"></div>
+
+    <div data-name="Intro" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button"><div id="start_tutorial" style="padding-left:75px; padding-right:75px;padding-top:30px; padding-bottom:30px;font-size:25px;text-align:center;vertical-align:middle;position:relative;margin:auto;opacity:1.0;line-height:1.3;font-weight:100;cursor:pointer;opacity:0.9"> Start Tutorial </div></div>
+
+    <div data-name="Demo" id="InstructionForward" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button">
+    <div id="right_arrow" style="font-size:55px;float:right;position:absolute;bottom:50%;right:0px;cursor: pointer; opacity:1.0;z-index:15;visibility:hidden;">&#8594;</div>
+  </div>
+   
+ </div>
+
+<script>
+instructionText = ["Welcome! This is an interactive tool developed by Edward Chang's lab at UCSF that shows how the human brain responds when we listen to speech sounds.","The colorful panel above shows a spectrogram of the sound you are hearing right now. A spectrogram is a picture of a sound, and tells us what frequencies are present in a sound.","High frequency sounds will show up as higher peaks in yellow and red at the top of the plot.  For example, watch when I say 'sssssss' or when I whistle a high pitched note. (whistle)","Lower frequency sounds will show up as higher peaks in yellow and red at the bottom part of the plot. Watch as I say 'aaahhhh'.  Another interesting thing is that if I change my voice to say a high 'aaaahhh' versus a low 'aaaahhh', you can see the harmonic stacks in the plot that are related to the pitch of these sounds.", "In addition to seeing the spectrograms, you can also see the predicted brain responses to the sounds I am saying here on the left hemisphere of the brain.","To read more details about the methods behind this, you can click on the (?) button at the top right after finishing this tutorial.","We show the activity of different regions of the brain as diamond-shaped markers, which are colored according to which sounds produce the strongest response in those areas.","For example, when the brain hears fricative sounds (like 'f', 's', and 'sh'), the areas marked in green will become more active.","Now, when I say the word 'snack', you will see the green areas become active, followed by the yellow, red, and purple areas.", "You can try this out on your own.  Press the microphone button below to record your own voice and look at the responses.  Try whistling, singing, or saying the same words I did.  Have fun!"];
+instructionAudioFiles = ['bin/snd/welcome_to_the_vortex.mp3','bin/snd/spectrogram_explanation.mp3','bin/snd/spectrogram_explanation2.mp3','bin/snd/low_frequency_sounds.mp3','bin/snd/brain_response_1.mp3','bin/snd/question_mark.mp3','bin/snd/we_show_the_activity.mp3','bin/snd/fricative_brain.mp3','bin/snd/snack.mp3','bin/snd/try_this_on_your_own.mp3','bin/snd/empty.mp3',];
+$('#start_tutorial').click(function(){
+  $('#instructions').html(instructionText[0]);
+  $('#start_tutorial').remove();
+  $('#left_arrow').css("visibility","visible");
+  $('#right_arrow').css("visibility","visible");
+  console.log("Starting Tutorial!");
+})
+step = 0;
+$('#left_arrow').click(function(){console.log(step);if(step > 0){$('#instructions').html(instructionText[step-1]);$('#InstructionBack').attr('data-src',instructionAudioFiles[step-1]);$('#InstructionForward').attr('data-src',instructionAudioFiles[step]);step = step-1;}});
+$('#right_arrow').click(function(){
+  console.log(step);
+  if(step < instructionText.length){
+    $('#instructions').html(instructionText[step+1]);
+    $('#InstructionForward').attr('data-src',instructionAudioFiles[step+1]);
+    $('#InstructionBack').attr('data-src',instructionAudioFiles[step]);
+    step = step+1;
+    if(step == instructionText.length-1){
+      $('.music-box__buttons__button.selector').css('z-index',15);
+      $('#tutorialintro').css('bottom',250); //$('music-box__buttons').css('height')+
+    }
+    if(step == instructionText.length){
+      $('#tutorialintro').css('visibility','hidden');
+      $('#tutorialintro').css('z-index','0');
+      $('#left_arrow').css('z-index','0');
+      $('#left_arrow').css('visibility','hidden');
+      $('#right_arrow').css('z-index','0');
+      $('#right_arrow').css('visibility','hidden');
+
+    }
+    if(step == 6){
+      $('#toggler').css('visibility','visible');
+    }
+  }});
+</script>
+
+<div id="toggler">
+  select electrode type<br>
+<label><input type="checkbox" id="cbox1" value="first_checkbox" onclick="toggleElec(0,this)" checked> <span style="color:red;">Vowels</span></label><br>
+  <label><input type="checkbox" id="cbox2" value="second_checkbox" onclick="toggleElec(1,this)" checked> <span style="color:#0000FF">Liquids and Glides</span></label><br>
+  <label><input type="checkbox" id="cbox3" value="third_checkbox" onclick="toggleElec(2,this)" checked> <span style="color:#00FF00;">Fricatives</span></label><br>
+  <label><input type="checkbox" id="cbox4" value="fourth_checkbox" onclick="toggleElec(3,this)" checked> <span style="color:#FF00FF;">Unvoiced Plosives</span></label><br>
+  <label><input type="checkbox" id="cbox5" value="fifth_checkbox" onclick="toggleElec(4,this)" checked> <span style="color:yellow;">Voiced Plosives</span></label><br>
+  <label><input type="checkbox" id="cbox6" value="sixth_checkbox" onclick="toggleElec(5,this)" checked> <span style="color:cyan;">Nasals</span></label><br>
+</div>
+
+ <canvas id="spectrogram"></canvas></div>
+      <canvas id="legend"></canvas>
+      <div id="iosButton"></div>
+      <div id="record" class="music-box__modal">
+         <div class="music-box__modal__message">
+            <div class="music-box__modal__record-rings"></div>
+            <div class="music-box__modal__record-rings"></div>
+            <div class="music-box__modal__icon icon-mic"></div>
+         </div>
+      </div>
+      <!-- <div id="drawAnywhere" class="music-box__modal">
+         <div class="music-box__modal__message">
+            <div class="music-box__hand-animation-sprite"></div>
+         </div>
+      </div> -->
+      <!-- <div id="loadingSound" class="music-box__modal">
+         <div class="music-box__modal__message">
+            <div id="loadingMessage" class="music-box__modal__message__text">Flute</div>
+            <svg class="spinner" width="55px" height="55px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+               <circle class="circle" fill="none" stroke-width="3" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+            </svg>
+         </div>
+      </div> -->
+      <div class="music-box__buttons">
+         <div data-mic data-name="mic" class="music-box__buttons__button selector">
+            <div class="icon icon-mic"></div>
+         </div>
+         <div data-name="Introduction by Dr. Edward Chang" data-src="bin/snd/eddie.mp3" class="music-box__buttons__button selector" id="changlogo">
+            <div class="icon icon-wine"></div>
+         </div>
+      </div>
+     
+</body>
+</html>
