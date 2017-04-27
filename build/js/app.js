@@ -855,7 +855,7 @@
                     n = this.TEXTURE_HEIGHT;
                 if (!this.freqByteData || this.freqByteData.length != this.analyser.frequencyBinCount) {
                     for (freqDataBuffer = [], i = 0; i < 37; i++) freqDataBuffer[i] = new Uint8Array(this.analyser.frequencyBinCount);
-                    strfRequest = new XMLHttpRequest, strfRequest.open("GET", "https://dl.dropboxusercontent.com/u/88928303/STRFmatNoEdge50HzAndAbove.bin", !0), strfRequest.responseType = "arraybuffer", strfRequest.onload = function(e) {}, strfRequest.addEventListener("load", function(e) {
+                    strfRequest = new XMLHttpRequest, strfRequest.open("GET", "bin/STRFmatNoEdge50HzAndAboveNormalized.bin", !0), strfRequest.responseType = "arraybuffer", strfRequest.onload = function(e) {}, strfRequest.addEventListener("load", function(e) {
                         for (rawStrfs = new Float32Array(strfRequest.response), channelStrfs = [], c = 0; c < 256; c++)
                             for (channelStrfs[c] = [], t = 0; t < 37; t++)
                                 for (channelStrfs[c][t] = new Float32Array(185), f = 0; f < 185; f++) channelStrfs[c][t][f] += rawStrfs[c + 256 * t + 9472 * f]
@@ -879,7 +879,7 @@
                         var all = [4,5,6,20,21,22,23,36,37,38,39,52,53,54,55,68,69,70,71,72,84,85,86,87,99,100,101,102,115,116,117,127,132,133,143,147,149,150,165,181,196];
                         //above is zero indexed
                         selectedCategory = all;
-                        selectedScaling = 0.01;
+                        selectedScaling = 0.000001;
                         for (this.analyser.smoothingTimeConstant = 0.05,this.analyser.getByteFrequencyData(freqByteData), i = 0; i < 36; i++) freqDataBuffer[i + 1] = freqDataBuffer[i];
                         for (freqDataBuffer[0] = freqByteData, c = 0; c < selectedCategory.length; c++) {
                             channelNum = selectedCategory[c];
