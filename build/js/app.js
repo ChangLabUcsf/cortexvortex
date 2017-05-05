@@ -860,17 +860,22 @@
                     //         for (channelStrfs[c] = [], t = 0; t < 37; t++)
                     //             for (channelStrfs[c][t] = new Float32Array(185), f = 0; f < 185; f++) channelStrfs[c][t][f] += rawStrfs[c + 256 * t + 9472 * f]
                     // }, !1), strfRequest.send(null), gridResponse = new Float32Array(256), freqByteData = new Uint8Array(this.analyser.frequencyBinCount), this.freqByteData = freqByteData, this.texture && (e.deleteTexture(this.texture), this.texture = null);
-                    freqDataBuffer = new Uint8Array(185*37);
+                    freqDataBuffer = new Uint8Array(185*13);
                     channelStrfs = [];
                     channelStrfsVectorized = [];
 
-                    strfRequest = new XMLHttpRequest, strfRequest.open("GET", "bin/STRFmatNoEdge50HzAndAbove.bin", !0), strfRequest.responseType = "arraybuffer", strfRequest.onload = function(e) {}, strfRequest.addEventListener("load", function(e) {
+                    //for debugging purposes
+                    gridResponseBuffer = [];
+                    freqDataBufferAll = [];
+                    allTimeStamps = [];
+
+                    strfRequest = new XMLHttpRequest, strfRequest.open("GET", "bin/STRFmatNoEdge50HzAndAboveDownsampled.bin", !0), strfRequest.responseType = "arraybuffer", strfRequest.onload = function(e) {}, strfRequest.addEventListener("load", function(e) {
                         for (rawStrfs = new Float32Array(strfRequest.response), c = 0; c < 256; c++){
                             console.log('reading in strfs from binary');
-                            channelStrfsVectorized[c] = new Float32Array(185*37);
-                            for (t = 0; t < 37; t++){
+                            channelStrfsVectorized[c] = new Float32Array(185*13);
+                            for (t = 0; t < 13; t++){
                                 for ( f = 0; f < 185; f++) {
-                                    channelStrfsVectorized[c][t*37+f] += rawStrfs[c + 256 * t + 9472 * f];
+                                    channelStrfsVectorized[c][(13-t)*185+f] += rawStrfs[c + 256 * t + 256*13 * f];
                                 }
                             }
                         }
@@ -907,17 +912,32 @@
                         //             gridResponse[channelNum] = Math.max(0,selectedScaling*gridResponse[channelNum]);//Math.min(1.5,selectedScaling*gridResponse[channelNum]);
                         // }
                         // break;
+
                         var all = [4,5,6,20,21,22,23,36,37,38,39,52,53,54,55,68,69,70,71,72,84,85,86,87,99,100,101,102,115,116,117,127,132,133,143,147,149,150,165,181,196];
                         selectedCategory = all;
-                        selectedScaling = 0.01;
+                        selectedScaling = 0.04;
                         this.analyser.smoothingTimeConstant = 0.02;
                         this.analyser.getByteFrequencyData(freqByteData);
-                        freqDataBuffer = Array.from(freqByteData.slice(0,185)).concat(freqDataBuffer.slice(0,185*36));
+                        freqDataBuffer = Array.from(freqByteData.slice(0,185)).concat(freqDataBuffer.slice(0,185*12));
+
+                        // if (eval( freqByteData.join('+') ) > 0){
+                        //     freqDataBufferAll.push(freqByteData.slice(0,185));
+                        //     gridResponseBuffer.push(resultVector.elements);
+                         //    allTimeStamps.push(Date.now());
+                         //}
+
                         resultVector = $M(channelStrfsVectorized).multiply($V(freqDataBuffer));
+                        gridResponse = resultVector.multiply(selectedScaling).elements;
                         for (c = 0; c < selectedCategory.length; c++) {
-                            channelNum = selectedCategory[c];
-                            gridResponse[channelNum] = selectedScaling*resultVector.e(channelNum);
+                             channelNum = selectedCategory[c];
+                             gridResponse[channelNum] = Math.max(0.0, gridResponse[channelNum]);//selectedScaling*resultVector.e(channelNum));
                         }
+                        // if ((gridResponseBuffer.length < 2000) && (eval( gridResponse.join('+') ) > 0)) {
+                        //     console.log(eval( gridResponse.join('+') ));
+                        //     console.log(gridResponseBuffer.length);
+                        //     gridResponseBuffer.push(resultVector.elements);
+                        // }
+
                         break;
 
                     case v:
@@ -976,7 +996,7 @@
             "use strict";
             window.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent), window.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream, window.requestAnimFrame = function() {
                 return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(e) {
-                    window.setTimeout(e, 1e3 / 60)
+                    window.setTimeout(e, 1e3 / 20)
                 }
             }();
             var h = e("./ui/spectrogram");
@@ -1194,7 +1214,7 @@
                     draw_: function() {
                         return g.isRendering ? void setTimeout(function() {
                             g.analyserView.doFrequencyAnalysis(), requestAnimationFrame(g.draw_.bind(g))
-                        }, 1e3 / 60) : void console.log("stopped draw_")
+                        }, 1e3 / 1000) : void console.log("stopped draw_")
                     },
                     drawLegend_: function() {
                         var e = $("#legend")[0],
