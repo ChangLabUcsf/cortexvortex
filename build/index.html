@@ -89,14 +89,16 @@
   </div>
 </div>
 
-   <div id="tutorialintro" style="background-color:#007788;width:100%;height:120px;bottom:0%;z-index:10;margin:auto;position:absolute;color:#FFFFFF;z-index:12;opacity:0.95;">
+   <div id="tutorialintro" style="background-color:#007788;width:100%;height:120px;bottom:0%;z-index:10;margin:auto;position:absolute;color:#FFFFFF;z-index:12;opacity:1.0;">
+
+    <div id="skip_tutorial" style="float:right; position: absolute; bottom:10px; right: 10px; padding-top:10px; padding-right:30px;font-size:15px;">Skip tutorial</div>
 
     <div data-name="Intro" id="InstructionBack" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button">
             <div id="left_arrow" style="font-size:55px;float:left;position:absolute;bottom:50%;cursor: pointer;opacity:1.0;z-index:15;visibility:hidden;">&#8592;</div>
     </div>
     <div id="instructions" style="padding-left:60px; padding-right:60px;padding-top:10px; padding-bottom:0px;font-size:18px;text-align:center;vertical-align:middle;position:relative;margin:auto;opacity:1.0;line-height:1.3;font-weight:100;opacity:0.9"></div>
 
-    <div data-name="Intro" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button"><div id="start_tutorial" style="padding-left:75px; padding-right:75px;padding-top:30px; padding-bottom:30px;font-size:25px;text-align:center;vertical-align:middle;position:relative;margin:auto;opacity:1.0;line-height:1.3;font-weight:100;cursor:pointer;opacity:0.9"> Start Tutorial </div></div>
+    <div data-name="Intro" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button"><div id="start_tutorial" style="padding-left:75px; padding-right:75px;padding-top:30px; padding-bottom:30px;font-size:25px;text-align:center;vertical-align:middle;position:relative;margin:auto;opacity:1.0;line-height:1.3;font-weight:100;cursor:pointer;opacity:0.9"> Loading... </div></div>
 
     <div data-name="Demo" id="InstructionForward" data-src="bin/snd/welcome_to_the_vortex.mp3" class="music-box__buttons__button">
     <div id="right_arrow" style="font-size:55px;float:right;position:absolute;bottom:50%;right:0px;cursor: pointer; opacity:1.0;z-index:15;visibility:hidden;">&#8594;</div>
@@ -107,6 +109,11 @@
 <script>
 instructionText = ["Welcome! This is an interactive tool developed by Edward Chang's lab at UCSF that shows how the human brain responds when we listen to speech sounds.","The colorful panel above shows a spectrogram of the sound you are hearing right now. A spectrogram is a picture of a sound, and tells us what frequencies are present in a sound.","High frequency sounds will show up as higher peaks in yellow and red at the top of the plot.  For example, watch when I say 'sssssss' or when I whistle a high pitched note. (whistle)","Lower frequency sounds will show up as higher peaks in yellow and red at the bottom part of the plot. Watch as I say 'aaahhhh'.  Another interesting thing is that if I change my voice to say a high 'aaaahhh' versus a low 'aaaahhh', you can see the harmonic stacks in the plot that are related to the pitch of these sounds.", "In addition to seeing the spectrograms, you can also see the predicted brain responses to the sounds I am saying here on the left hemisphere of the brain.","To read more details about the methods behind this, you can click on the (?) button at the top right after finishing this tutorial.","We show the activity of different regions of the brain as diamond-shaped markers, which are colored according to which sounds produce the strongest response in those areas.","For example, when the brain hears fricative sounds (like 'f', 's', and 'sh'), the areas marked in green will become more active.","Now, when I say the word 'snack', you will see the green areas become active, followed by the yellow, red, and purple areas.", "You can try this out on your own.  Press the microphone button below to record your own voice and look at the responses.  Try whistling, singing, or saying the same words I did.  Have fun!"];
 instructionAudioFiles = ['bin/snd/welcome_to_the_vortex.mp3','bin/snd/spectrogram_explanation.mp3','bin/snd/spectrogram_explanation2.mp3','bin/snd/low_frequency_sounds.mp3','bin/snd/brain_response_1.mp3','bin/snd/question_mark.mp3','bin/snd/we_show_the_activity.mp3','bin/snd/fricative_brain.mp3','bin/snd/snack.mp3','bin/snd/try_this_on_your_own.mp3','bin/snd/empty.mp3',];
+
+setTimeout(function() {
+    $('#start_tutorial').html('Start Tutorial');
+}, 7000);
+
 $('#start_tutorial').click(function(){
   $('#instructions').html(instructionText[0]);
   $('#start_tutorial').remove();
@@ -114,6 +121,16 @@ $('#start_tutorial').click(function(){
   $('#right_arrow').css("visibility","visible");
   console.log("Starting Tutorial!");
 })
+
+$('#skip_tutorial').click(function(){
+      $('#tutorialintro').css('visibility','hidden');
+      $('#tutorialintro').css('z-index','0');
+      $('#left_arrow').css('z-index','0');
+      $('#left_arrow').css('visibility','hidden');
+      $('#right_arrow').css('z-index','0');
+      $('#right_arrow').css('visibility','hidden');
+})
+
 step = 0;
 $('#left_arrow').click(function(){console.log(step);if(step > 0){$('#instructions').html(instructionText[step-1]);$('#InstructionBack').attr('data-src',instructionAudioFiles[step-1]);$('#InstructionForward').attr('data-src',instructionAudioFiles[step]);step = step-1;}});
 $('#right_arrow').click(function(){
