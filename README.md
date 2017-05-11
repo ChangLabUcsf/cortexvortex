@@ -13,6 +13,4 @@ After you click one of the buttons, brain responses are calculated based on mode
 
 Click the microphone button to see predicted responses to your own voice in real time, or click the other buttons to listen to previously recorded example sounds.
 
-For more methodological details, see the <a href="summary.html">short summary here</a>.
-
 Developed by David Chang, Liberty Hamilton, and Morgan Lee at the <a href="http://changlab.ucsf.edu">Laboratory of Edward Chang at UCSF</a>. We thank Roger Anguera Singla of the Gazzaley lab for providing Glass Brain code. Special thanks to Jeramy Morrill and Boris Smus for developing the original <a href="https://musiclab.chromeexperiments.com/Spectrogram">Spectrogram code</a>, and a big thank you to the participants who volunteered their time and made this research possible. Participants provided written informed consent, and all procedures were approved by the UCSF Institutional Review Board.
